@@ -8,7 +8,7 @@ int main(int ac, char *av[])
 		{
 			std::ifstream input(av[1]);
 			BitcoinExchange s(input);
-			s.chek_file();
+			s.check_file();
 		}
 		else
 			std::cerr << "Error: could not open file." << std::endl;
