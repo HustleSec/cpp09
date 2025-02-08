@@ -59,6 +59,8 @@ void	BitcoinExchange::check_db(std::string date)
 {
 	std::map<std::string , double>::iterator it_low;
 	it_low = mp_db.lower_bound(date);
+	if (date != it_low->first || it_low == mp.end())
+		it_low--;
 	std::cout << date << " => " << mp[date] << " = " << it_low->second * mp[date] << std::endl;
 }
 
