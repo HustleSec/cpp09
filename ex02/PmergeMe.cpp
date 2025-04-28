@@ -1,5 +1,6 @@
 #include "PmergeMe.hpp"
 #include <algorithm>
+#include <climits>
 #include <iterator>
 #include <ostream>
 
@@ -281,8 +282,20 @@ PmergeMe::PmergeMe(char **av, int ac)
         int i = 1;
         while (i + 1 < ac)
         {
+            char* endptr;
+            unsigned long result = std::strtoul(av[i], &endptr, 10);
+            unsigned long result_1 = std::strtoul(av[i+1], &endptr, 10);
+            if (result > INT_MAX || result_1 > INT_MAX)
+                return ;
             this->pairs.push_back(std::make_pair(atoi(av[i]), atoi(av[i + 1])));
 			i += 2;
+        }
+        if ((int)pairs.size() * 2 < ac - 1)
+        {
+            char* endptr1;
+            unsigned long result_2 = std::strtoul(av[ac - 1], &endptr1, 10);
+            if (result_2 > INT_MAX)
+                return ;
         }
 
         if (this->check_double(ac, av))
@@ -337,8 +350,20 @@ PmergeMe::PmergeMe(char **av, int ac)
         int i = 1;
         while (i + 1 < ac)
         {
+            char* endptr;
+            unsigned long result = std::strtoul(av[i], &endptr, 10);
+            unsigned long result_1 = std::strtoul(av[i+1], &endptr, 10);
+            if (result > INT_MAX || result_1 > INT_MAX)
+                return ;
             this->pairs_dq.push_back(std::make_pair(atoi(av[i]), atoi(av[i + 1])));
 			i += 2;
+        }
+        if ((int)pairs_dq.size() * 2 < ac - 1)
+        {
+            char* endptr1;
+            unsigned long result_2 = std::strtoul(av[ac - 1], &endptr1, 10);
+            if (result_2 > INT_MAX)
+                return ;
         }
 
         if (this->check_double_dq(ac, av))
@@ -379,8 +404,6 @@ PmergeMe::PmergeMe(char **av, int ac)
         duration1 = duration1 / 1e6;
         std::cout << std::fixed << std::setprecision(6);
         std::cout << "Time to process a range of 5 elements with std::deque : " << duration1 << " us" << "\n";
-
-        std::cout << "\n\n\n\n\n" << std::is_sorted(chain.begin(), chain.end()) << "   " << std::is_sorted(chain_dq.begin(), chain_dq.end()) << std::endl;
     }
 	
 }
