@@ -1,4 +1,5 @@
 #include "PmergeMe.hpp"
+#include <algorithm>
 #include <iterator>
 #include <ostream>
 
@@ -239,37 +240,29 @@ void PmergeMe::combination()
         first = jacob[i];
         last = jacob[i + 1];
         comb.push_back(jacob[i + 1]);
-       if ((last - first) > 1)
-       {
-            for (int j = last - 1; j > first; --j)
-                comb.push_back(j);
-       }
+        for (int j = last - 1; j > first; --j)
+            comb.push_back(j);
     }
 }
 
 void PmergeMe::combination_dq()
 {
-    int first, last, i = 0;
+    int first, last;
 
-    while (i+1 < (int)jacob_dq.size() - 1)
+    for (int i = 0; i < ((int)jacob_dq.size() - 1) && comb_dq.size() < chain_dq.size(); i++)
     {
         first = jacob_dq[i];
         last = jacob_dq[i + 1];
-
-        comb_dq.push_back(jacob[i + 1]);
-        while (first < last - 1 && comb_dq.size() < chain_dq.size())
-        {
-            last--;
-            comb_dq.push_back(last);
-        }
-        i++;
+        comb_dq.push_back(jacob_dq[i + 1]);
+        for (int j = last - 1; j > first; --j)
+            comb_dq.push_back(j);
     }
 }
 
 
 PmergeMe::PmergeMe(char **av, int ac)
 {
-    //  ============== vector ===========
+    //  =========== vector ===========
     timeval start, end;
 
     gettimeofday(&start, NULL);
@@ -314,7 +307,11 @@ PmergeMe::PmergeMe(char **av, int ac)
            }
        }
         if ((int)chain.size() < ac - 1)
-            chain.insert(chain.begin(), atoi(av[ac - 1]));
+        {
+            std::vector<int>::iterator k;
+            k = std::lower_bound(chain.begin(), chain.end(), atoi(av[ac - 1]));
+            chain.insert(k, atoi(av[ac - 1]));
+        }
 
         gettimeofday(&end, NULL);
 
@@ -366,7 +363,13 @@ PmergeMe::PmergeMe(char **av, int ac)
            }
        }
         if ((int)chain_dq.size() < ac - 1)
-            chain_dq.insert(chain_dq.begin(), atoi(av[ac - 1]));
+        {
+            int v = atoi(av[ac - 1]);
+
+            std::deque<int>::iterator k_dq;
+            k_dq = std::lower_bound(chain_dq.begin(), chain_dq.end(), v);
+            chain_dq.insert(k_dq, v);
+        }
 
         gettimeofday(&end1, NULL);
 
@@ -376,11 +379,11 @@ PmergeMe::PmergeMe(char **av, int ac)
         duration1 = duration1 / 1e6;
         std::cout << std::fixed << std::setprecision(6);
         std::cout << "Time to process a range of 5 elements with std::deque : " << duration1 << " us" << "\n";
+
+        std::cout << "\n\n\n\n\n" << std::is_sorted(chain.begin(), chain.end()) << "   " << std::is_sorted(chain_dq.begin(), chain_dq.end()) << std::endl;
     }
 	
 }
-
-
 
 PmergeMe::~PmergeMe()
 {}

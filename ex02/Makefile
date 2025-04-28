@@ -1,5 +1,5 @@
 CC = c++
-CC += -Wall -Wextra -Werror -fsanitize=address -g -std=c++98
+CC += -Wall -Wextra -Werror -std=c++98
 RM = rm -f
 NAME = PmergeMe
 
