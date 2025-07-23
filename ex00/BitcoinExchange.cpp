@@ -1,5 +1,6 @@
 #include "BitcoinExchange.hpp"
 #include <algorithm>
+#include <cstddef>
 #include <cstdio>
 #include <fstream>
 #include <stdexcept>
@@ -20,22 +21,17 @@ BitcoinExchange::BitcoinExchange(std::ifstream &input)
 	this->a = 0;
 }
 
-int BitcoinExchange::ft_isumber(char *ptr)
+int BitcoinExchange::ft_isumber(std::string s)
 {
-	int i;
+	int i = 0;
 
-	if (ptr[0] == '.')
+	while (s[i])
 	{
-		i = 1;
-		while (ptr && ptr[i] != '\0')
-		{
-			if (ptr[i] < '0' || ptr[i] > '9')
-				return (0);
-			i++;
-		}
-		return (1);
+		if ((s[i] < '0' || s[i] > '9') && s[i] != '-')
+			return (0);
+		i++;
 	}
-	return (0);
+	return (1);
 }
 
 void	BitcoinExchange::ft_db()
@@ -59,10 +55,53 @@ void	BitcoinExchange::check_db(std::string date)
 {
 	std::map<std::string , double>::iterator it_low;
 	it_low = mp_db.lower_bound(date);
-	if (date != it_low->first || it_low == mp.end())
-		it_low--;
-	std::cout << date << " => " << mp[date] << " = " << it_low->second * mp[date] << std::endl;
+	if (it_low == mp_db.end() || it_low->first != date)
+	{
+		if (it_low != mp_db.begin())
+		{
+        	it_low--;
+			std::cout << std::fixed << std::setprecision(0) << date << " => " << mp[date] << " = " << it_low->second * mp[date] << std::endl;
+		}
+		else
+			std::cout << "bade date or invalid one\n";
+	}
 }
+
+int count(std::string s)
+{
+	int i = 0, count = 0;
+
+	while (s[i])
+	{
+		if (s[i] == '-')
+			count++;
+		i++;
+	}
+	if (count != 2)
+		return (0);
+	return (1);
+}
+
+int validate(std::string date)
+{
+    size_t pos1 = date.find('-');
+    size_t pos2 = date.find('-', pos1 + 1);
+
+    int year = std::stoi(date.substr(0, pos1));
+    int month = std::stoi(date.substr(pos1 + 1, pos2 - pos1 - 1));
+    int day = std::stoi(date.substr(pos2 + 1));
+
+    if (year < 2000 || year > 9999 || day < 1 || day > 31 || month < 1 || month > 12)
+		return (0);
+
+	int days[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (year % 4 != 0) 
+        days[1] = 28;
+	if (days[month - 1] != day)
+		return (0);
+	return (1);
+}
+
 
 void BitcoinExchange::check_file()
 {
@@ -85,7 +124,7 @@ void BitcoinExchange::check_file()
 		else if (line.find(" | ") != std::string::npos)
 		{
 			std::string date = line.substr(0, line.find(" |"));
-			if (date.find(" ") != std::string::npos || date.find("	") != std::string::npos)
+			if (date.find(" ") != std::string::npos || date.find("	") != std::string::npos || !ft_isumber(date) || !count(date) || !validate(date))
 			{
 				std::cout << "Error: bad input => " << date << std::endl;
 				continue;
@@ -93,6 +132,15 @@ void BitcoinExchange::check_file()
 			std::string value = line.substr(line.find("| ") + 2, line.find("\n"));
 			char *ptr = NULL;
 			double v = std::strtod(value.c_str(), &ptr);
+			size_t pos = value.find('.');
+			if (pos != std::string::npos)
+			{
+				if (pos == 0 || pos == value.size() - 1)
+				{
+					std::cout << "not a valid number\n";
+					continue ;
+				}
+			}
 			if (v < 1)
 			{
 				std::cout << "Error: not a positive number." << std::endl;
@@ -103,7 +151,7 @@ void BitcoinExchange::check_file()
 				std::cout << "Error: not a number or invalid character after the number\n";
 				continue;
 			}
-			else if (v > INT_MAX)
+			else if (v > INT_MAX || v > 1000)
 			{
 				std::cout << "Error: too large a number." << std::endl;
 				continue;

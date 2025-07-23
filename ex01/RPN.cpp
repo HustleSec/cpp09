@@ -7,6 +7,11 @@ RPN::~RPN(){}
 
 void	RPN::rpn(std::string &input)
 {
+	if (input.empty())
+	{
+		std::cout << "empty input" << std::endl;
+		return ;
+	}
 	std::stack<double> stack;
 	std::stringstream ss(input);
 	std::string elem;

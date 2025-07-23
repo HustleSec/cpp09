@@ -1,5 +1,5 @@
 CC = c++
-CC += -Wall -Wextra -Werror -std=c++98
+CC += -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g
 RM = rm -f
 NAME = btc
 

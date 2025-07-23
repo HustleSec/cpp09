@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <iomanip>
 
 class BitcoinExchange
 {
@@ -20,7 +21,7 @@ class BitcoinExchange
 
 
 		void	check_file();
-		int		ft_isumber(char *ptr);
+		int		ft_isumber(std::string s);
 		void	ft_db();
 		void	check_db(std::string date);
 };
