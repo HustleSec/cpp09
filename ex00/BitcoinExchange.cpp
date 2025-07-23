@@ -91,14 +91,13 @@ int validate(std::string date)
     int month = std::stoi(date.substr(pos1 + 1, pos2 - pos1 - 1));
     int day = std::stoi(date.substr(pos2 + 1));
 
-    if (year < 2000 || year > 9999 || day < 1 || day > 31 || month < 1 || month > 12)
-		return (0);
-
 	int days[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (year % 4 != 0) 
         days[1] = 28;
-	if (days[month - 1] != day)
+
+    if (year < 2000 || year > 9999 || day < 1 || day > days[month - 1] || month < 1 || month > 12)
 		return (0);
+
 	return (1);
 }
 
@@ -151,7 +150,7 @@ void BitcoinExchange::check_file()
 				std::cout << "Error: not a number or invalid character after the number\n";
 				continue;
 			}
-			else if (v > INT_MAX || v > 1000)
+			else if (v > 1000)
 			{
 				std::cout << "Error: too large a number." << std::endl;
 				continue;

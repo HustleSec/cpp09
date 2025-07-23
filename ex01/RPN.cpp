@@ -1,5 +1,5 @@
 #include "RPN.hpp"
-#include <cstdlib>
+#include <climits>
 
 RPN::RPN(){}
 
@@ -12,11 +12,11 @@ void	RPN::rpn(std::string &input)
 		std::cout << "empty input" << std::endl;
 		return ;
 	}
-	std::stack<double> stack;
+	std::stack<int> stack;
 	std::stringstream ss(input);
 	std::string elem;
 	
-	while (ss >> elem) 
+	while (ss >> elem)
 	{
 		if (elem == "+" || elem == "-" || elem == "*" || elem == "/")
 		{
@@ -26,9 +26,10 @@ void	RPN::rpn(std::string &input)
 				return;
 			}
 
-			double b = stack.top(); stack.pop();
-			double a = stack.top(); stack.pop();
-			double result = 0.0;
+			long long b = stack.top(); stack.pop();
+			long long a = stack.top(); stack.pop();
+			
+			long long result = 0;
 
 			if (elem == "+")
 				result = a + b;
@@ -45,23 +46,26 @@ void	RPN::rpn(std::string &input)
 				}
 				result = a / b;
 			}
-			stack.push(result);
-		} else 
-		{
-			char* end;
-			double num = std::strtod(elem.c_str(), &end);
-			if (*end == '\0') 
-				stack.push(num);
-			else 
+			if (result > INT_MAX || result < INT_MIN) 
 			{
-				std::cerr << "Error: Invalid token '" << elem << "'!" << std::endl;
+				std::cerr << "Error: Integer overflow in addition!" << std::endl;
 				return;
 			}
-		}
+			stack.push(result);
+		} 
+		else
+			stack.push(std::stoi(elem));
 	}
 
 	if (stack.size() == 1) 
-		std::cout << "Final result: " << stack.top() << std::endl;
+	{
+		if ((long long)stack.top() > INT_MAX || (long long)stack.top() < INT_MIN) 
+		{
+			std::cerr << "Error: Integer overflow in addition!" << std::endl;
+			return;
+		}
+		std::cout << stack.top() << std::endl;
+	}
 	else
 		std::cerr << "Error: Stack size is not 1 after processing!" << std::endl;
 }
